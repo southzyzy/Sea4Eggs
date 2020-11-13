@@ -1,0 +1,74 @@
+en
+conf t
+hostname SW2
+
+no cdp run
+
+logging 172.16.67.2
+
+vlan 210
+name "Legal Secretary"
+exit
+
+! Enable port security
+int range fa0/1-24
+switchport mode access
+switchport nonegotiate
+switchport port-security 
+switchport port-security violation restrict
+switchport port-security maximum 1
+switchport port-security mac-address sticky
+spanning-tree bpduguard enable
+shut
+exit
+
+
+! Configure trunk to L3
+int g0/1
+switchport mode trunk
+switchport nonegotiate
+switchport trunk allowed vlan add 210
+no shut
+exit
+
+int g0/2
+switchport access vlan 210
+no shut
+exit
+
+
+! Configure access ports used by legal secretaries
+int range fa0/1-22
+switchport access vlan 210
+no shut
+exit
+
+
+! Configure DHCP snooping
+ip dhcp snooping
+ip dhcp snooping vlan 210
+ip arp inspection vlan 210
+ip dhcp snooping verify mac-address
+
+
+! Set dhcp snooping and DAI inspection limit
+int range fa0/1-24
+ip dhcp snooping limit rate 25
+ip arp inspection limit rate 100
+exit
+
+int range g0/1-2
+ip dhcp snooping limit rate 25
+ip arp inspection limit rate 100
+ip dhcp snooping trust
+ip arp inspection trust
+exit
+
+ip arp inspection limit rate src-mac dst-mac ip
+
+! Set IPSG, with ip-mac filter
+int range fa0/1-24
+ip verify source port-security
+exit
+
+end

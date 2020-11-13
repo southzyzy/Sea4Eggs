@@ -1,0 +1,125 @@
+en
+conf t
+hostname SW1
+
+no cdp run
+
+logging 172.16.67.2
+
+vlan 100
+name Partners
+exit
+
+vlan 110
+name Asscioate
+exit
+
+vlan 200
+name "Law Clerks"
+exit
+
+vlan 300
+name "IT Support"
+exit
+
+vlan 310
+name Marketing
+exit
+
+vlan 37
+name CLO
+exit
+
+vlan 66
+name "Internal Servers"
+exit
+
+
+! Enable port security
+int range fa0/1-24
+switchport mode access
+switchport nonegotiate
+switchport port-security 
+switchport port-security violation restrict
+switchport port-security maximum 1
+switchport port-security mac-address sticky
+spanning-tree bpduguard enable
+shut
+exit
+
+
+! Configure trunk to L3
+int range g0/1-2
+switchport mode trunk
+switchport nonegotiate
+switchport trunk allowed vlan 37,100,110,200,300,310,66
+no shut
+exit
+
+
+! Configure access ports for different VLANs
+int fa0/1
+switchport access vlan 100
+no shut
+exit
+
+int fa0/2
+switchport access vlan 110
+no shut
+exit
+
+int fa0/3
+switchport access vlan 200
+no shut
+exit
+
+int fa0/4
+switchport access vlan 300
+no shut
+exit
+
+int fa0/5
+switchport access vlan 310
+no shut
+exit
+
+int fa0/6
+switchport access vlan 37
+no shut
+exit
+
+int range fa0/7-8
+switchport access vlan 66
+no shut
+exit
+
+
+! Configure DHCP snooping
+ip dhcp snooping
+ip dhcp snooping vlan 37,66,100,110,200,300,310
+ip arp inspection vlan 37,66,100,110,200,300,310
+ip dhcp snooping verify mac-address
+
+
+! Set dhcp snooping and DAI inspection limit
+int range fa0/1-24
+ip dhcp snooping limit rate 25
+ip arp inspection limit rate 100
+exit
+
+int range g0/1-2
+ip dhcp snooping limit rate 25
+ip arp inspection limit rate 100
+ip dhcp snooping trust
+ip arp inspection trust
+exit
+
+ip arp inspection limit rate src-mac dst-mac ip
+
+
+! Set IPSG, with ip-mac filter
+int range g1/0/3-24
+ip verify source port-security
+exit
+
+end
