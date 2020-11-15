@@ -93,7 +93,6 @@ switchport access vlan 66
 no shut
 exit
 
-
 ! Configure DHCP snooping
 ip dhcp snooping
 ip dhcp snooping vlan 37,66,100,110,200,300,310
@@ -108,8 +107,14 @@ ip arp inspection limit rate 100
 exit
 
 int range g0/1-2
+ip dhcp snooping trust
+ip arp inspection trust
 ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
+exit
+
+! Set Snooping Trust to DHCP Server
+int fa0/7
 ip dhcp snooping trust
 ip arp inspection trust
 exit
@@ -118,8 +123,8 @@ ip arp inspection limit rate src-mac dst-mac ip
 
 
 ! Set IPSG, with ip-mac filter
-int range g1/0/3-24
-ip verify source port-security
-exit
+! int range fa0/1-24
+! ip verify source port-security
+! exit
 
 end
