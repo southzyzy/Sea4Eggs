@@ -1,62 +1,117 @@
+################################
+##### Basic configurations #####
+################################
 en
 conf t
-hostname SW2
+hostname ACCESS-SW2
 
+#######################
+##### Disable CDP #####
+#######################
 no cdp run
 
+################################
+##### Disable HTTP servers #####
+################################
+no ip http server
+no ip http secure-server
+
+####################################
+##### Enable logging to splunk #####
+####################################
 logging 172.16.67.2
 
+###############################################
+##### Create VLAN 210 for Legal Secretary #####
+###############################################
 vlan 210
 name "Legal Secretary"
 exit
 
-! Enable port security
-int range fa0/1-24
+################################
+##### Enable port security #####
+################################
+int range fa0/1-23
 switchport mode access
 switchport nonegotiate
 switchport port-security 
-switchport port-security violation restrict
+switchport port-security violation shutdown
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 spanning-tree bpduguard enable
 shut
 exit
 
-
-! Configure trunk to L3
-int g0/1
-switchport mode trunk
-switchport nonegotiate
-switchport trunk allowed vlan add 210
-no shut
-exit
-
-int g0/2
-switchport access vlan 210
-no shut
-exit
-
-
-! Configure access ports used by legal secretaries
+######################################
+##### Configure end-client ports #####
+######################################
 int range fa0/1-22
-switchport access vlan 210
+switchport mode access 
 no shut
 exit
 
+#################################
+##### Configure unused port #####
+#################################
+int fa0/23
+switchport mode access
+switchport access vlan 99
+shut
+exit
 
-! Configure DHCP snooping
+#####################################
+##### Configure management port #####
+#####################################
+int fa0/24
+switchport mode access
+switchport access vlan 68
+no shut
+exit
+
+#####################################
+##### Configure access to L3SW1 #####
+#####################################
+int g0/1
+switchport mode access
+no shut
+exit
+
+#####################################
+##### Configure access to L3SW2 #####
+#####################################
+int g0/2 
+switchport mode access
+no shut
+exit
+
+#####################################
+##### Set up SVI for management #####
+#####################################
+int vlan 68
+description MANAGEMENT
+ip address 172.16.68.7 255.255.255.240
+
+###########################################
+##### Configure DHCP snooping and DAI #####
+###########################################
 ip dhcp snooping
 ip dhcp snooping vlan 210
 ip arp inspection vlan 210
 ip dhcp snooping verify mac-address
 
-
-! Set dhcp snooping and DAI inspection limit
+#########################################
+##### Set limit rate (pps) and IPSG #####
+#########################################
 int range fa0/1-24
+ip verify source
+ip verify source port-security
 ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
 exit
 
+#########################################################################
+##### Set limit rate (pps) and trust incoming Offer and Ack packets #####
+#########################################################################
 int range g0/1-2
 ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
@@ -64,11 +119,10 @@ ip dhcp snooping trust
 ip arp inspection trust
 exit
 
-ip arp inspection limit rate src-mac dst-mac ip
-
-! Set IPSG, with ip-mac filter
-! int range fa0/1-24
-! ip verify source port-security
-! exit
+###########################################################
+##### Validate layer 2 information to ARP information #####
+###########################################################
+ip arp inspection validate src-mac dst-mac ip
+exit
 
 end
