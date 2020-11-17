@@ -57,7 +57,8 @@ exit
 #############################################
 int vlan 68
 description MANAGEMENT
-ip address 172.16.68.6. 255.255.255.240
+ip address 172.16.68.6 255.255.255.240
+exit
 
 ################################
 ##### Enable port security #####
