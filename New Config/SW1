@@ -1,17 +1,35 @@
+##############################
+##### Configure Hostname #####
+##############################
 en
 conf t
-hostname SW1
+hostname ACCESS-SW1
 
+#######################
+##### disable CDP #####
+#######################
 no cdp run
 
+###############################
+##### Disable HTTP server #####
+###############################
+no ip http server
+no ip http secure-server
+
+##########################
+##### Splunk logging #####
+##########################
 logging 172.16.67.2
 
+###########################
+##### Configure VLANS #####
+###########################
 vlan 100
 name Partners
 exit
 
 vlan 110
-name Asscioate
+name Associate
 exit
 
 vlan 200
@@ -34,21 +52,30 @@ vlan 66
 name "Internal Servers"
 exit
 
+#############################################
+##### add ip address to MANAGEMENT VLAN #####
+#############################################
+int vlan 68
+description MANAGEMENT
+ip address 172.16.68.6. 255.255.255.240
 
-! Enable port security
+################################
+##### Enable port security #####
+################################
 int range fa0/1-24
 switchport mode access
 switchport nonegotiate
 switchport port-security 
-switchport port-security violation restrict
+switchport port-security violation shutdown
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 spanning-tree bpduguard enable
 shut
 exit
 
-
-! Configure trunk to L3
+#################################
+##### Configure trunk to L3 #####
+#################################
 int range g0/1-2
 switchport mode trunk
 switchport nonegotiate
@@ -56,8 +83,9 @@ switchport trunk allowed vlan 37,100,110,200,300,310,66
 no shut
 exit
 
-
-! Configure access ports for different VLANs
+######################################################
+##### Configure access ports for different VLANs #####
+######################################################
 int fa0/1
 switchport access vlan 100
 no shut
@@ -93,14 +121,17 @@ switchport access vlan 66
 no shut
 exit
 
-! Configure DHCP snooping
+###################################
+##### Configure DHCP snooping #####
+###################################
 ip dhcp snooping
 ip dhcp snooping vlan 37,66,100,110,200,300,310
 ip arp inspection vlan 37,66,100,110,200,300,310
 ip dhcp snooping verify mac-address
 
-
-! Set dhcp snooping and DAI inspection limit
+######################################################
+##### Set dhcp snooping and DAI inspection limit #####
+######################################################
 int range fa0/1-24
 ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
@@ -113,18 +144,24 @@ ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
 exit
 
-! Set Snooping Trust to DHCP Server
+#############################################
+##### Set Snooping Trust to DHCP Server #####
+#############################################
 int fa0/7
 ip dhcp snooping trust
 ip arp inspection trust
 exit
 
-ip arp inspection limit rate src-mac dst-mac ip
+##########################################
+##### Validate ARP Reply matching L2 #####
+##########################################
+ip arp inspection validate src-mac dst-mac ip
 
-
-! Set IPSG, with ip-mac filter
-! int range fa0/1-24
-! ip verify source port-security
-! exit
+########################################
+##### Set IPSG, with ip-mac filter #####
+########################################
+int range fa0/1-24
+ip verify source port-security
+exit
 
 end
