@@ -161,6 +161,7 @@ ip arp inspection validate src-mac dst-mac ip
 ##### Set IPSG, with ip-mac filter #####
 ########################################
 int range fa0/1-24
+ip verify source
 ip verify source port-security
 exit
 
