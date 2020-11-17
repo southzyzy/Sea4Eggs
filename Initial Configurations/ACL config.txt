@@ -1,0 +1,337 @@
+! =============================================
+! ACL for DMZ
+! =============================================
+en
+conf t
+
+! Create object groups for networks
+object-group network PARTNERS
+network-object 172.16.100.0 255.255.255.248
+exit
+object-group network ASSOCIATES
+network-object 172.16.110.0 255.255.255.240
+exit
+object-group network LAW_CLERKS
+network-object 172.16.200.0 255.255.255.248
+exit
+object-group network LEGAL_SECRETARIES
+network-object 172.16.210.0 255.255.255.224
+exit
+object-group network IT_SUPPORT
+network-object 172.16.30.0 255.255.255.248
+exit
+object-group network MARKETING_LEADS
+network-object 172.16.31.0 255.255.255.248
+exit
+object-group network CHIEF_LEGAL_OFFICE
+network-object 172.16.37.0 255.255.255.248
+exit
+object-group network INTERNAL_SERVER_FARM
+network-object 172.16.66.0 255.255.255.248
+exit
+object-group network SYSLOG
+network-object 172.16.67.0 255.255.255.252
+exit
+object-group network MANAGEMENT_VLAN
+network-object 172.16.68.0 255.255.255.240
+exit
+object-group network HONEYPOT
+network-object 172.16.69.0 255.255.255.252
+exit
+object-group network DMZ
+network-object 172.16.81.0 255.255.255.248
+exit
+
+object-group network INTERNAL_NETWORK
+group-object PARTNERS
+group-object ASSOCIATES
+group-object LAW_CLERKS
+group-object LEGAL_SECRETARIES
+group-object IT_SUPPORT
+group-object MARKETING_LEADS
+group-object CHIEF_LEGAL_OFFICE
+group-object INTERNAL_SEVER_FARM
+exit
+
+object-group network WEB_FACING_SERVICES
+group-object DMZ
+group-object HONEYPOT
+exit
+
+object-group network MANAGEMENT_NETWORK
+group-object MANAGEMENT_VLAN
+group-object SYSLOG
+exit
+
+! -----------------------------------
+ip access-list extended RESTRICT_HONEY_OUT
+deny ip object-group HONEYPOT object-group INTERNAL_NETWORK
+deny ip object-group HONEYPOT object-group MANAGEMENT_NETWORK
+deny ip object-group HONEYPOT object-group DMZ
+permit ip object-group HONEYPOT any
+exit
+
+ip access-list extended RESTRICT_HONEY_IN
+deny ip object-group INTERNAL_NETWORK object-group HONEYPOT
+deny ip object-group INTERNAL_NETWORK object-group HONEYPOT
+deny ip object-group INTERNAL_NETWORK object-group HONEYPOT
+permit ip any object-group HONEYPOT
+exit
+
+! Restrict HONEYPOT outbound traffic
+int g0/2
+ip access-group RESTRICT_HONEY_OUT in
+exit
+
+! Restrict HONEYPORT inbound traffic
+int g0/0
+ip access-group RESTRICT_HONEY_OUT out
+exit
+! -----------------------------------
+
+
+
+! =============================================
+! ACL for L3SW1 and L3SW2
+! =============================================
+en
+conf t
+
+! Create object groups for networks
+object-group network PARTNERS
+network-object 172.16.100.0 255.255.255.248
+exit
+object-group network ASSOCIATES
+network-object 172.16.110.0 255.255.255.240
+exit
+object-group network LAW_CLERKS
+network-object 172.16.200.0 255.255.255.248
+exit
+object-group network LEGAL_SECRETARIES
+network-object 172.16.210.0 255.255.255.224
+exit
+object-group network IT_SUPPORT
+network-object 172.16.30.0 255.255.255.248
+exit
+object-group network MARKETING_LEADS
+network-object 172.16.31.0 255.255.255.248
+exit
+object-group network CHIEF_LEGAL_OFFICE
+network-object 172.16.37.0 255.255.255.248
+exit
+object-group network INTERNAL_SERVER_FARM
+network-object 172.16.66.0 255.255.255.248
+exit
+object-group network SYSLOG
+network-object 172.16.67.0 255.255.255.252
+exit
+object-group network MANAGEMENT_VLAN
+network-object 172.16.68.0 255.255.255.240
+exit
+object-group network HONEYPOT
+network-object 172.16.69.0 255.255.255.252
+exit
+object-group network DMZ
+network-object 172.16.81.0 255.255.255.248
+exit
+
+object-group network INTERNAL_NETWORK
+group-object PARTNERS
+group-object ASSOCIATES
+group-object LAW_CLERKS
+group-object LEGAL_SECRETARIES
+group-object IT_SUPPORT
+group-object MARKETING_LEADS
+group-object CHIEF_LEGAL_OFFICE
+group-object INTERNAL_SEVER_FARM
+exit
+
+object-group network WEB_FACING_SERVICES
+group-object DMZ
+group-object HONEYPOT
+exit
+
+object-group network MANAGEMENT_NETWORK
+group-object MANAGEMENT_VLAN
+group-object SYSLOG
+exit
+
+! -----------------------------------
+! Create time range for office hours
+time-range OFFICE_HOURS
+periodic weekdays 9:00 to 18:00
+exit
+
+! Create ACL to restrict internet access to legal seceretaries
+ip access-list extended RESTRICT_LEGAL_SECRETARIES 
+permit ip object-group LEGAL_SECRETARIES object-group INTERNAL_NETWORK
+permit ip object-group LEGAL_SECRETARIES object-group WEB_FACING_SERVICES
+deny ip object-group LEGAL_SECRETARIES any time-range OFFICE_HOURS
+deny ip any any
+exit
+
+! Apply Restrict ACL for LEGAL SECRETARIES
+int g1/0/2
+ip access-group RESTRICT_LEGAL_SECRETARIES in
+exit
+! -----------------------------------
+
+
+
+! =============================================
+! ACL for Firewall
+! =============================================
+en
+conf t
+
+! Create object groups for networks
+object-group network PARTNERS
+network-object 172.16.100.0 255.255.255.248
+exit
+object-group network ASSOCIATES
+network-object 172.16.110.0 255.255.255.240
+exit
+object-group network LAW_CLERKS
+network-object 172.16.200.0 255.255.255.248
+exit
+object-group network LEGAL_SECRETARIES
+network-object 172.16.210.0 255.255.255.224
+exit
+object-group network IT_SUPPORT
+network-object 172.16.30.0 255.255.255.248
+exit
+object-group network MARKETING_LEADS
+network-object 172.16.31.0 255.255.255.248
+exit
+object-group network CHIEF_LEGAL_OFFICE
+network-object 172.16.37.0 255.255.255.248
+exit
+object-group network INTERNAL_SERVER_FARM
+network-object 172.16.66.0 255.255.255.248
+exit
+object-group network SYSLOG
+network-object 172.16.67.0 255.255.255.252
+exit
+object-group network MANAGEMENT_VLAN
+network-object 172.16.68.0 255.255.255.240
+exit
+object-group network HONEYPOT
+network-object 172.16.69.0 255.255.255.252
+exit
+object-group network DMZ
+network-object 172.16.81.0 255.255.255.248
+exit
+
+! Define the internal network object group
+object-group network INTERNAL_NETWORK
+group-object PARTNERS
+group-object ASSOCIATES
+group-object LAW_CLERKS
+group-object LEGAL_SECRETARIES
+group-object IT_SUPPORT
+group-object MARKETING_LEADS
+group-object CHIEF_LEGAL_OFFICE
+group-object INTERNAL_SEVER_FARM
+exit
+
+object-group network WEB_FACING_SERVICES
+group-object DMZ
+group-object HONEYPOT
+exit
+
+object-group network MANAGEMENT_NETWORK
+group-object MANAGEMENT_VLAN
+group-object SYSLOG
+exit
+
+object-group service SYSLOG_TRAFFIC
+service-object udp destination eq 514
+exit
+
+
+! -----------------------------------
+! Permit syslog traffic from edge router and DMZ router towards SYSLOG server
+access-list CUSTOM_SYSLOG extended permit object-group SYSLOG_TRAFFIC host 172.16.0.1 object-group SYSLOG
+access-list CUSTOM_SYSLOG extended permit object-group SYSLOG_TRAFFIC host 172.16.3.2 object-group SYSLOG
+access-list CUSTOM_SYSLOG extended deny ip any any
+
+! Apply SYSLOG ACL (for network devices) to firewall interface facing MGNT Router
+int g0/1
+ip access-group CUSTOM_SYSLOG out
+exit
+! -----------------------------------
+
+
+
+! =============================================
+! ACL for Edge
+! =============================================
+en
+conf t
+
+! Create object groups for networks
+object-group network PARTNERS
+network-object 172.16.100.0 255.255.255.248
+exit
+object-group network ASSOCIATES
+network-object 172.16.110.0 255.255.255.240
+exit
+object-group network LAW_CLERKS
+network-object 172.16.200.0 255.255.255.248
+exit
+object-group network LEGAL_SECRETARIES
+network-object 172.16.210.0 255.255.255.224
+exit
+object-group network IT_SUPPORT
+network-object 172.16.30.0 255.255.255.248
+exit
+object-group network MARKETING_LEADS
+network-object 172.16.31.0 255.255.255.248
+exit
+object-group network CHIEF_LEGAL_OFFICE
+network-object 172.16.37.0 255.255.255.248
+exit
+object-group network INTERNAL_SERVER_FARM
+network-object 172.16.66.0 255.255.255.248
+exit
+
+! Define the internal network object group
+object-group network INTERNAL_NETWORK
+group-object PARTNERS
+group-object ASSOCIATES
+group-object LAW_CLERKS
+group-object LEGAL_SECRETARIES
+group-object IT_SUPPORT
+group-object MARKETING_LEADS
+group-object CHIEF_LEGAL_OFFICE
+group-object INTERNAL_SEVER_FARM
+exit
+
+! -----------------------------------
+! -- Anti-Spoofing -- !
+!  Deny RFC 3330 special-use address
+access-list 110 deny ip 0.0.0.0 any
+access-list 110 deny ip 127.0.0.0 0.255.255.255 any
+access-list 110 deny ip 192.0.2.0 0.0.0.255 any
+access-list 110 deny ip 224.0.0.0 31.255.255.255 any
+
+! Filter RFC 1918 space
+access-list 110 deny ip 10.0.0.0 0.255.255.255 any
+access-list 110 deny ip 172.16.0.0 0.15.255.255 any
+access-list 110 deny ip 192.168.0.0 0.0.255.255 any
+
+! Deny your CIDR space coming in from Internet as source
+access-list 110 deny ip 172.16.0.0 0.0.255.255 any
+
+! Deny access to internal infrasturcture addresses
+access-list 110 deny ip any INTERNAL_NETWORK
+
+! Permit transit traffic
+access-list 110 permit ip any any
+
+int g0/1
+ip access-group 110 in
+! -----------------------------------
+
+
+! ***** REMEMBER TO ADD "no ip unreachables" ***** !
