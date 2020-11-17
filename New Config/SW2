@@ -28,9 +28,9 @@ vlan 210
 name "Legal Secretary"
 exit
 
-################################
-##### Enable port security #####
-################################
+#######################################
+##### Enable port security & IPSG #####
+######################################
 int range fa0/1-23
 switchport mode access
 switchport nonegotiate
@@ -39,6 +39,7 @@ switchport port-security violation shutdown
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 spanning-tree bpduguard enable
+ip verify source port-security
 shut
 exit
 
@@ -69,6 +70,13 @@ no shut
 exit
 
 #####################################
+##### Set up SVI for management #####
+#####################################
+int vlan 68
+description MANAGEMENT
+ip address 172.16.68.7 255.255.255.240
+
+#####################################
 ##### Configure access to L3SW1 #####
 #####################################
 int g0/1
@@ -84,13 +92,6 @@ switchport mode access
 no shut
 exit
 
-#####################################
-##### Set up SVI for management #####
-#####################################
-int vlan 68
-description MANAGEMENT
-ip address 172.16.68.7 255.255.255.240
-
 ###########################################
 ##### Configure DHCP snooping and DAI #####
 ###########################################
@@ -99,9 +100,9 @@ ip dhcp snooping vlan 210
 ip arp inspection vlan 210
 ip dhcp snooping verify mac-address
 
-#########################################################################
-##### Set limit rate (pps) and trust incoming Offer and Ack packets #####
-#########################################################################
+#############################################
+##### Set snooping & DAI to L3SW1/L3SW2 #####
+#############################################
 int range g0/1-2
 ip dhcp snooping limit rate 25
 ip arp inspection limit rate 100
@@ -114,5 +115,41 @@ exit
 ###########################################################
 ip arp inspection validate src-mac dst-mac ip
 exit
+
+##########################
+##### Enable TACACS+ #####
+##########################
+aaa new-model
+tacacs server TACACSERVER
+address ipv4 172.16.68.8
+key Sea4EggsC0mpl3xP@ssw0rd
+exit
+ip tacacs source-interface fa0/24
+aaa authentication login default group tacacs+ local
+
+###############################
+##### Test authentication #####
+###############################
+test aaa group tacacs+ network_manager Rapes&Redwine legacy
+
+##########################################
+##### Enable privilege mode password #####
+##########################################
+enable algorithm-type sha256 secret SW2C0mpl3xP@ssw0rd
+
+##########################################
+##### Enable ssh on virtual terminal #####
+##########################################
+line vty 0 15 
+transport input ssh
+login authentication default
+exit
+
+######################
+##### Enable SSH #####
+######################
+ip domain-name sea4eggs.sitict
+crpyot key generate rsa modulus 2048
+ip ssh version 2
 
 end
