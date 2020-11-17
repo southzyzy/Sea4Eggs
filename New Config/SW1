@@ -165,4 +165,28 @@ ip verify source
 ip verify source port-security
 exit
 
+############################
+##### Creating SSH Key #####
+############################
+ip domain-name remote.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+
+############################
+##### Configure TACACS #####
+############################
+aaa new-model
+tacacs server TACACSERVER
+address ipv4 172.16.68.8
+key Sea4EggsC0mpl3xP@ssw0rd
+exit
+ip tacacs source-interface vlan68
+
+line vty 0 15
+transport input ssh
+aaa authentication login default tacacs+ local
+login authentication default
+
+aaa authentication login default group tacacs+ local
+
 end
