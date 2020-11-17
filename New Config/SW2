@@ -113,15 +113,6 @@ exit
 ##### Validate layer 2 information to ARP information #####
 ###########################################################
 ip arp inspection validate src-mac dst-mac ip
-exit
-
-########################################
-##### Set IPSG, with ip-mac filter #####
-########################################
-int range fa0/1-23
-ip verify source
-ip verify source port-security
-exit
 
 ##########################
 ##### Enable TACACS+ #####
