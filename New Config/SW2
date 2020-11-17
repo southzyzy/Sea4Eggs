@@ -99,16 +99,6 @@ ip dhcp snooping vlan 210
 ip arp inspection vlan 210
 ip dhcp snooping verify mac-address
 
-#########################################
-##### Set limit rate (pps) and IPSG #####
-#########################################
-int range fa0/1-24
-ip verify source
-ip verify source port-security
-ip dhcp snooping limit rate 25
-ip arp inspection limit rate 100
-exit
-
 #########################################################################
 ##### Set limit rate (pps) and trust incoming Offer and Ack packets #####
 #########################################################################
