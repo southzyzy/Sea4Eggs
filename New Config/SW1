@@ -16,11 +16,6 @@ no cdp run
 no ip http server
 no ip http secure-server
 
-#############################
-##### Set local account #####
-#############################
-username sea4eggs-admin algorithm-type sha256 secret 1qwer$#@!~sea4eggs
-
 ###################################
 ##### Set logging level to 6 ######
 ###################################
