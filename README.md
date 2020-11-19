@@ -30,8 +30,10 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 
 #### Local Accounts 
 
-| Username | Password |
-| --- |:---:|
-| sea4eggs-admin | 1qwer$#@!~sea4eggs |
+| Device | Username | Password |
+| --- |:---:|:---:|
+| Splunk | sea4eggs-admin | 1qwer$#@!~sea4eggs |
+| Database | root | rootcatdogmousehorse |
+| Database | sea4eggs-admin | catdogmousehorse |
 
 ---
