@@ -164,7 +164,7 @@ exit
 #############################################
 ##### Set Snooping Trust to DHCP Server #####
 #############################################
-int fa0/7
+int fa0/17
 ip dhcp snooping trust
 ip arp inspection trust
 exit
