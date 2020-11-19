@@ -1,6 +1,11 @@
 # Sea4Eggs
 ### Network Security Team Project
 
+## SSH Command around MGNT Network
+```shell
+ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <target_ip>
+```
+
 ---
 
 ## Password Configurations
