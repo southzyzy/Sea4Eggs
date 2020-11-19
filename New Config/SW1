@@ -16,10 +16,11 @@ no cdp run
 no ip http server
 no ip http secure-server
 
-##########################
-##### Splunk logging #####
-##########################
+###################################
+##### Set logging level to 6 ######
+###################################
 logging 172.16.67.2
+logging trap 6
 
 ###########################
 ##### Configure VLANS #####
@@ -80,44 +81,52 @@ exit
 int range g0/1-2
 switchport mode trunk
 switchport nonegotiate
-switchport trunk allowed vlan 37,100,110,200,300,310,66
+switchport trunk allowed vlan 37,66,100,110,200,300,310
 no shut
 exit
 
 ######################################################
 ##### Configure access ports for different VLANs #####
 ######################################################
-int fa0/1
+
+# Partners 2
+int range fa0/1-2
 switchport access vlan 100
 no shut
 exit
 
-int fa0/2
+# Associate 5
+int range fa0/3-7
 switchport access vlan 110
 no shut
 exit
 
-int fa0/3
+# Law Clerks 3
+int range fa0/8-10
 switchport access vlan 200
 no shut
 exit
 
-int fa0/4
+# IT Support 3
+int range fa0/11-13
 switchport access vlan 300
 no shut
 exit
 
-int fa0/5
+# Marketing 1
+int range fa0/14
 switchport access vlan 310
 no shut
 exit
 
-int fa0/6
+# CLO 2
+int range fa0/15-16
 switchport access vlan 37
 no shut
 exit
 
-int range fa0/7-8
+# Internal Servers
+int range fa0/17-19
 switchport access vlan 66
 no shut
 exit
