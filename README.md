@@ -3,7 +3,7 @@
 
 ---
 
-## SSH Command around MGNT Network
+## SSH around MGNT Network
 
 | Device | Network |
 | --- |:---:|
@@ -20,6 +20,7 @@
 | DHCP | 172.16.66.3 |
 | DNS | 172.27.54.34 |
 
+#### SSH Command
 
 ```shell
 ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <target_ip>
