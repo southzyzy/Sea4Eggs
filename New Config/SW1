@@ -16,6 +16,13 @@ no cdp run
 no ip http server
 no ip http secure-server
 
+#######################
+##### Config NTP ######
+#######################
+clock timezone SGT 8
+ntp server 172.16.67.2 prefer
+ntp logging
+
 ###################################
 ##### Set logging level to 6 ######
 ###################################
@@ -72,6 +79,7 @@ switchport port-security violation shutdown
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 spanning-tree bpduguard enable
+spanning-tree portfast
 shut
 exit
 
@@ -88,7 +96,6 @@ exit
 ######################################################
 ##### Configure access ports for different VLANs #####
 ######################################################
-
 # Partners 2
 int range fa0/1-2
 switchport access vlan 100
@@ -191,7 +198,7 @@ address ipv4 172.16.68.8
 key Sea4EggsC0mpl3xP@ssw0rd
 exit
 ip tacacs source-interface fa0/24
-aaa authentication login default tacacs+ local
+aaa authentication login default group tacacs+ local
 
 ###############################
 ##### Test authentication #####
@@ -202,6 +209,17 @@ test aaa group tacacs+ network_manager Rapes&Redwine legacy
 ##### Enable privilege mode password #####
 ##########################################
 enable algorithm-type sha256 secret SW1C0mpl3xP@ssw0rd
+
+###########################################################
+##### Create TACACS+ account for local authentication #####
+###########################################################
+username network_manager privilege 15 algorithm-type sha256 secret Rapes&Redwine
+
+########################################################
+##### Create local account for local authentication ####
+######### Do not use unless absolutely required ########
+########################################################
+username sea4eggs-admin privilege 15 algorithm-type sha256 secret 1qwer$#@!~sea4eggs
 
 ##########################################
 ##### Enable ssh on virtual terminal #####
@@ -217,5 +235,10 @@ exit
 ip domain-name sea4eggs.sitict
 crypto key generate rsa modulus 2048
 ip ssh version 2
+
+##############################
+##### Set STP Uplinkfast #####
+##############################
+spanning-tree uplinkfast
 
 end
