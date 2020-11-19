@@ -57,7 +57,7 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 #### NextCloud Accounts 
 | Username | Password |
 | --- |:---:|
-| admin | Rapes&Redwine |
+| sea4eggsnextcloudadmin | Rapes&Redwine |
 | ncuser | C0mpl3xP@ssw0rd |
 
 ---
