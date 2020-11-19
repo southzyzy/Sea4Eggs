@@ -54,4 +54,11 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 | Database | root | rootcatdogmousehorse |
 | Database | sea4eggs-admin | catdogmousehorse |
 
+#### NextCloud Accounts 
+| Username | Password |
+| --- |:---:|
+| admin | Rapes&Redwine |
+| ncuser | C0mpl3xP@ssw0rd |
+
 ---
+
