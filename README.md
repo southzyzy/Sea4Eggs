@@ -17,7 +17,13 @@
 | SW2 | 172.16.68.7 |
 | TACACS+ | 172.16.68.8 |
 | R2_DMZ | 172.16.3.2 |
+
+### Splunk Logging Network
+| Device | Network |
+| --- |:---:|
+| L3SW2 | 172.16.2.2 |
 | DHCP | 172.16.66.3 |
+| Syslog | 172.16.67.1 |
 | DNS | 172.27.54.34 |
 
 ### SSH Command
