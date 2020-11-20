@@ -52,12 +52,12 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 
 #### Privilege Mode Password
 
-| Device | Password | Devices |
+| Device | Password |
 | --- |:---:| :---:|
-| TACAS+ | 1qwer$#@!~ | R1, Firewall |
-| SW1 | SW1C0mpl3xP@ssw0rd | |
-| SW2 | SW2C0mpl3xP@ssw0rd | | 
-| Other | C0mpl3xP@ssw0rd | |
+| TACAS+ | 1qwer$#@!~ |
+| SW1 | SW1C0mpl3xP@ssw0rd |
+| SW2 | SW2C0mpl3xP@ssw0rd | 
+| Other | C0mpl3xP@ssw0rd |
 
 #### Local Accounts 
 
