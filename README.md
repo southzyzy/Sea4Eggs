@@ -45,7 +45,9 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 | Network Engineer 2 | network_engineer2 | Grapes&Redwine |
 
 #### SSH Accounts
+
 | Network | Username | Password |
+| --- |:---:| :---:|
 | IT Support | jumphost | 1qwer$#@!~sea4eggs |
 
 #### Privilege Mode Password
