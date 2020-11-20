@@ -1,0 +1,150 @@
+Current configuration : 2257 bytes
+!
+! Last configuration change at 08:42:18 UTC Fri Nov 20 2020 by network_manager
+! NVRAM config last updated at 08:03:59 UTC Wed Nov 18 2020
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1-MGNT-SYSLOG
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 8 $8$QvZkYHtgyOX..U$Ha4OsLZbcN5ZyLUNKuaCkU6STep6X4uGzADvNROtTMg
+!
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization commands 15 default group tacacs+ local
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name intranet.sea4eggs.sitict.net
+ip cef
+login on-failure log
+login on-success log
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+cts logging verbose
+!
+!
+license udi pid CISCO2911/K9 sn FGL200611AX
+!
+!
+username sea4eggs-admin privilege 15 secret 8 $8$.KUHPbCLLXBJWE$/IGRdrA5gJcZdMpjbX4NQ3.57wt7UDYveN.QfYi/0mU
+!
+redundancy
+!
+!
+!
+!
+no cdp run
+!
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description UPLINK
+ ip address 172.16.4.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description MGNT
+ ip address 172.16.68.1 255.255.255.240
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ ip address 172.16.67.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 0.0.0.0 0.0.0.0 172.16.4.1
+!
+logging host 172.16.67.2
+!
+!
+tacacs server TACACSERVER
+ address ipv4 172.16.68.8
+ key Sea4EggsC0mpl3xP@ssw0rd
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 15
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp logging
+ntp server 172.16.67.2 prefer
+!
+end

@@ -1,0 +1,344 @@
+: Saved
+:
+ASA Version 9.1(2)
+!
+hostname TheGreatWall
+domain-name intranet.sea4eggs.sitict.net
+enable password qJeZ4fn.rvv1ctjo encrypted
+xlate per-session deny tcp any4 any4
+xlate per-session deny tcp any4 any6
+xlate per-session deny tcp any6 any4
+xlate per-session deny tcp any6 any6
+xlate per-session deny udp any4 any4 eq domain
+xlate per-session deny udp any4 any6 eq domain
+xlate per-session deny udp any6 any4 eq domain
+xlate per-session deny udp any6 any6 eq domain
+names
+!
+interface GigabitEthernet0/0
+ nameif EDGE-ROUTER
+ security-level 0
+ ip address 172.16.0.2 255.255.255.252
+!
+interface GigabitEthernet0/1
+ nameif R1-MGNT-SYSLOG
+ security-level 100
+ ip address 172.16.4.1 255.255.255.252
+!
+interface GigabitEthernet0/2
+ nameif R2-DMZ
+ security-level 50
+ ip address 172.16.3.1 255.255.255.252
+!
+interface GigabitEthernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/4
+ nameif L3SW1
+ security-level 80
+ ip address 172.16.1.1 255.255.255.252
+!
+interface GigabitEthernet0/5
+ nameif L3SW2
+ security-level 80
+ ip address 172.16.2.1 255.255.255.252
+!
+interface Management0/0
+ nameif management
+ security-level 100
+ ip address 172.16.68.2 255.255.255.240
+!
+!
+time-range OFFICE_HOURS
+ periodic weekdays 9:00 to 18:00
+!
+ftp mode passive
+clock timezone SGT 8
+dns server-group DefaultDNS
+ domain-name intranet.sea4eggs.sitict.net
+same-security-traffic permit inter-interface
+object-group network PARTNERS
+ network-object 172.16.100.0 255.255.255.248
+object-group network ASSOCIATES
+ network-object 172.16.110.0 255.255.255.240
+object-group network LAW_CLERKS
+ network-object 172.16.200.0 255.255.255.248
+object-group network LEGAL_SECRETARIES
+ network-object 172.16.210.0 255.255.255.224
+object-group network IT_SUPPORT
+ network-object 172.16.30.0 255.255.255.248
+object-group network MARKETING_LEADS
+ network-object 172.16.31.0 255.255.255.248
+object-group network CHIEF_LEGAL_OFFICE
+ network-object 172.16.37.0 255.255.255.248
+object-group network INTERNAL_SERVER_NET
+ network-object 172.16.66.0 255.255.255.248
+object-group network SYSLOG_NET
+ network-object 172.16.67.0 255.255.255.252
+object-group network MANAGEMENT_NET
+ network-object 172.16.68.0 255.255.255.240
+object-group network HONEYPOT_NET
+ network-object 172.16.69.0 255.255.255.252
+object-group network DMZ_NET
+ network-object 172.16.81.0 255.255.255.252
+object-group network R1_FW_UPLINK
+ network-object 172.16.4.0 255.255.255.252
+object-group network R2_FW_UPLINK
+ network-object 172.16.3.0 255.255.255.252
+object-group network EDGE_ROUTER_MGNT
+ network-object host 172.16.0.1
+object-group network R2_DMZ_MGNT
+ network-object host 172.16.3.2
+object-group network L3SW1_UPLINK
+ network-object host 172.16.1.2
+object-group network L3SW2_UPLINK
+ network-object host 172.16.2.2
+object-group network SYSLOG_SERVER
+ network-object host 172.16.67.2
+object-group network TACACS_SERVER
+ network-object host 172.16.68.8
+object-group network DMZ_SERVER
+ network-object host 172.16.81.2
+object-group network HONEYPOT_SERVER
+ network-object host 172.16.69.2
+object-group network INTERNAL_NETWORK
+ group-object PARTNERS
+ group-object ASSOCIATES
+ group-object LAW_CLERKS
+ group-object LEGAL_SECRETARIES
+ group-object IT_SUPPORT
+ group-object MARKETING_LEADS
+ group-object CHIEF_LEGAL_OFFICE
+ group-object INTERNAL_SERVER_NET
+object-group network WAN_FACING_SERVICES
+ group-object DMZ_SERVER
+ group-object HONEYPOT_SERVER
+object-group network IT_MANAGEMENT
+ group-object MANAGEMENT_NET
+ group-object SYSLOG_NET
+object-group service SYSLOG_TRAFFIC
+ service-object udp destination eq ntp
+ service-object udp destination eq syslog
+ service-object tcp destination eq 9997
+ service-object icmp
+object-group service TACACS_TRAFFIC
+ service-object tcp destination eq tacacs
+ service-object icmp
+object-group service DMZ_TRAFFIC
+ service-object tcp destination eq www
+ service-object tcp-udp destination eq domain
+object-group service HONEYPOT_TRAFFIC
+ service-object tcp destination eq ftp
+ service-object tcp destination eq ssh
+object-group service NETFLOW_TRAFFIC
+ service-object udp destination eq 9991
+ service-object icmp
+object-group network INTERNAL_DNS_SERVER
+ network-object host 172.16.66.3
+object-group service DNS_TRAFFIC
+ service-object tcp destination eq domain
+ service-object udp destination eq domain
+object-group service DMZ_SYSLOG_TRAFFIC
+ service-object udp destination eq 9992
+ service-object udp destination eq ntp
+ service-object icmp
+access-list DMZ_HTTP_SERVER extended permit tcp any4 object-group DMZ_SERVER eq www
+access-list EDGE_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group EDGE_ROUTER_MGNT object-group SYSLOG_SERVER
+access-list EDGE_INBOUND extended permit object-group NETFLOW_TRAFFIC object-group EDGE_ROUTER_MGNT object-group SYSLOG_SERVER
+access-list EDGE_INBOUND extended permit object-group TACACS_TRAFFIC object-group EDGE_ROUTER_MGNT object-group TACACS_SERVER
+access-list EDGE_INBOUND extended permit object-group DMZ_TRAFFIC any4 object-group DMZ_SERVER
+access-list EDGE_INBOUND extended permit object-group HONEYPOT_TRAFFIC any4 object-group HONEYPOT_SERVER
+access-list EDGE_INBOUND extended deny ip any any
+access-list R1_MGNT_INBOUND extended deny ip any object-group HONEYPOT_NET
+access-list R1_MGNT_INBOUND extended permit object-group DNS_TRAFFIC object-group IT_MANAGEMENT object-group INTERNAL_DNS_SERVER
+access-list R1_MGNT_INBOUND extended deny tcp object-group SYSLOG_NET object-group EDGE_ROUTER_MGNT eq ssh
+access-list R1_MGNT_INBOUND extended deny ip object-group SYSLOG_NET object-group R2_FW_UPLINK
+access-list R1_MGNT_INBOUND extended deny ip object-group SYSLOG_NET object-group INTERNAL_NETWORK
+access-list R1_MGNT_INBOUND extended deny ip object-group SYSLOG_NET object-group DMZ_NET
+access-list R1_MGNT_INBOUND extended permit ip any4 any4
+access-list R2_DMZ_INBOUND extended permit object-group DMZ_SYSLOG_TRAFFIC object-group DMZ_SERVER object-group SYSLOG_SERVER
+access-list R2_DMZ_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group R2_DMZ_MGNT object-group SYSLOG_SERVER
+access-list R2_DMZ_INBOUND extended permit object-group TACACS_TRAFFIC object-group R2_DMZ_MGNT object-group TACACS_SERVER
+access-list R2_DMZ_INBOUND extended deny tcp any object-group EDGE_ROUTER_MGNT eq ssh
+access-list R2_DMZ_INBOUND extended deny ip any object-group R1_FW_UPLINK
+access-list R2_DMZ_INBOUND extended deny ip any object-group INTERNAL_NETWORK
+access-list R2_DMZ_INBOUND extended deny ip any object-group IT_MANAGEMENT
+access-list R2_DMZ_INBOUND extended permit ip any4 any4
+access-list L3SW1_INBOUND extended deny ip any object-group HONEYPOT_NET
+access-list L3SW1_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group L3SW1_UPLINK object-group SYSLOG_SERVER
+access-list L3SW1_INBOUND extended permit object-group TACACS_TRAFFIC object-group L3SW1_UPLINK object-group TACACS_SERVER
+access-list L3SW1_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group INTERNAL_SERVER_NET object-group SYSLOG_SERVER
+access-list L3SW1_INBOUND extended permit tcp object-group INTERNAL_NETWORK object-group DMZ_SERVER eq www
+access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group EDGE_ROUTER_MGNT
+access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group R1_FW_UPLINK
+access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group R2_FW_UPLINK
+access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group IT_MANAGEMENT
+access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group DMZ_NET
+access-list L3SW1_INBOUND extended deny tcp any object-group EDGE_ROUTER_MGNT eq ssh
+access-list L3SW1_INBOUND extended deny ip any object-group R1_FW_UPLINK
+access-list L3SW1_INBOUND extended deny ip any object-group R2_FW_UPLINK
+access-list L3SW1_INBOUND extended deny ip any object-group IT_MANAGEMENT
+access-list L3SW1_INBOUND extended deny ip any object-group DMZ_NET
+access-list L3SW1_INBOUND extended deny ip object-group LEGAL_SECRETARIES any time-range OFFICE_HOURS
+access-list L3SW1_INBOUND extended permit ip any4 any4
+access-list L3SW2_INBOUND extended deny ip any object-group HONEYPOT_NET
+access-list L3SW2_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group L3SW2_UPLINK object-group SYSLOG_SERVER
+access-list L3SW2_INBOUND extended permit object-group TACACS_TRAFFIC object-group L3SW2_UPLINK object-group TACACS_SERVER
+access-list L3SW2_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group INTERNAL_SERVER_NET object-group SYSLOG_SERVER
+access-list L3SW2_INBOUND extended permit tcp object-group INTERNAL_NETWORK object-group DMZ_SERVER eq www
+access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group EDGE_ROUTER_MGNT
+access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group R1_FW_UPLINK
+access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group R2_FW_UPLINK
+access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group IT_MANAGEMENT
+access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group DMZ_NET
+access-list L3SW2_INBOUND extended deny tcp any object-group EDGE_ROUTER_MGNT eq ssh
+access-list L3SW2_INBOUND extended deny ip any object-group R1_FW_UPLINK
+access-list L3SW2_INBOUND extended deny ip any object-group R2_FW_UPLINK
+access-list L3SW2_INBOUND extended deny ip any object-group IT_MANAGEMENT
+access-list L3SW2_INBOUND extended deny ip any object-group DMZ_NET
+access-list L3SW2_INBOUND extended deny ip object-group LEGAL_SECRETARIES any time-range OFFICE_HOURS
+access-list L3SW2_INBOUND extended permit ip any4 any4
+pager lines 24
+logging enable
+logging timestamp
+logging trap informational
+logging host R1-MGNT-SYSLOG 172.16.67.2 17/1337
+mtu EDGE-ROUTER 1500
+mtu R1-MGNT-SYSLOG 1500
+mtu R2-DMZ 1500
+mtu L3SW1 1500
+mtu L3SW2 1500
+mtu management 1500
+icmp unreachable rate-limit 1 burst-size 1
+no asdm history enable
+arp timeout 14400
+no arp permit-nonconnected
+access-group EDGE_INBOUND in interface EDGE-ROUTER
+access-group R1_MGNT_INBOUND in interface R1-MGNT-SYSLOG
+access-group R2_DMZ_INBOUND in interface R2-DMZ
+access-group L3SW1_INBOUND in interface L3SW1
+access-group L3SW2_INBOUND in interface L3SW2
+route EDGE-ROUTER 0.0.0.0 0.0.0.0 172.16.0.1 1
+route L3SW1 172.16.30.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.30.0 255.255.255.248 172.16.2.2 200
+route L3SW1 172.16.31.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.31.0 255.255.255.248 172.16.2.2 200
+route L3SW1 172.16.37.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.37.0 255.255.255.248 172.16.2.2 200
+route L3SW1 172.16.66.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.66.0 255.255.255.248 172.16.2.2 200
+route R1-MGNT-SYSLOG 172.16.67.0 255.255.255.252 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.1 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.3 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.4 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.5 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.6 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.7 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.8 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.9 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.10 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.11 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.12 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.13 255.255.255.255 172.16.4.2 1
+route R1-MGNT-SYSLOG 172.16.68.14 255.255.255.255 172.16.4.2 1
+route R2-DMZ 172.16.69.0 255.255.255.252 172.16.3.2 1
+route R2-DMZ 172.16.81.0 255.255.255.252 172.16.3.2 1
+route L3SW1 172.16.100.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.100.0 255.255.255.248 172.16.2.2 200
+route L3SW1 172.16.110.0 255.255.255.240 172.16.1.2 1
+route L3SW2 172.16.110.0 255.255.255.240 172.16.2.2 200
+route L3SW1 172.16.200.0 255.255.255.248 172.16.1.2 1
+route L3SW2 172.16.200.0 255.255.255.248 172.16.2.2 200
+route L3SW2 172.16.210.0 255.255.255.224 172.16.2.2 1
+route L3SW1 172.16.210.0 255.255.255.224 172.16.1.2 200
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+dynamic-access-policy-record DfltAccessPolicy
+aaa-server TACACSERVER protocol tacacs+
+aaa-server TACACSERVER (management) host 172.16.68.8
+ key *****
+user-identity default-domain LOCAL
+aaa authentication ssh console TACACSERVER LOCAL
+aaa authentication enable console TACACSERVER LOCAL
+aaa authorization command TACACSERVER LOCAL
+aaa accounting ssh console TACACSERVER
+aaa accounting enable console TACACSERVER
+aaa accounting command TACACSERVER
+no snmp-server location
+no snmp-server contact
+crypto ipsec security-association pmtu-aging infinite
+crypto ca trustpool policy
+telnet timeout 5
+ssh 172.16.68.0 255.255.255.240 management
+ssh timeout 30
+ssh version 2
+ssh key-exchange group dh-group1-sha1
+console timeout 0
+threat-detection basic-threat
+threat-detection statistics access-list
+threat-detection statistics tcp-intercept rate-interval 3 burst-rate 60 average-rate 30
+ntp server 172.16.67.2 prefer
+username sea4eggs-admin password 5K1JAEp7ssCmMDru encrypted
+!
+class-map DMZ_HTTP_TRAFFIC
+ match access-list DMZ_HTTP_SERVER
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+policy-map INSPECT_DMZ_HTTP_TRAFFIC
+ class DMZ_HTTP_TRAFFIC
+  set connection embryonic-conn-max 15 per-client-max 15 per-client-embryonic-max 10
+  set connection timeout idle 0:00:10
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect ip-options
+  inspect netbios
+  inspect rsh
+  inspect rtsp
+  inspect skinny
+  inspect esmtp
+  inspect sqlnet
+  inspect sunrpc
+  inspect tftp
+  inspect sip
+  inspect xdmcp
+  inspect icmp
+!
+service-policy global_policy global
+service-policy INSPECT_DMZ_HTTP_TRAFFIC interface EDGE-ROUTER
+service-policy INSPECT_DMZ_HTTP_TRAFFIC interface R1-MGNT-SYSLOG
+service-policy INSPECT_DMZ_HTTP_TRAFFIC interface L3SW1
+service-policy INSPECT_DMZ_HTTP_TRAFFIC interface L3SW2
+prompt hostname context
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly 26
+  subscribe-to-alert-group configuration periodic monthly 26
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:3827db53e55762d40038c4040adadc6e
+: end

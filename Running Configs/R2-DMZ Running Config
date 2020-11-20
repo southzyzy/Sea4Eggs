@@ -1,0 +1,217 @@
+Current configuration : 4001 bytes
+!
+! Last configuration change at 17:28:11 SGT Fri Nov 20 2020 by network_manager
+! NVRAM config last updated at 17:28:12 SGT Fri Nov 20 2020 by network_manager
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2-DMZ
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 8 $8$pqTlK.ZOTbztLE$xxkQLvzN1fQuYQjWrigPE0g2p6vEk1TgfMI.Sw3z77w
+!
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization commands 15 default group tacacs+ local
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone SGT 8 0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name intranet.sea4eggs.sitict.net
+ip cef
+login on-failure log
+login on-success log
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+cts logging verbose
+!
+!
+license udi pid CISCO2911/K9 sn FGL200611B5
+!
+!
+object-group network ASSOCIATES
+ 172.16.110.0 255.255.255.240
+!
+object-group network CHIEF_LEGAL_OFFICE
+ 172.16.37.0 255.255.255.248
+!
+object-group network DMZ
+ host 172.16.81.2
+!
+object-group network HONEYPOT
+ 172.16.69.0 255.255.255.252
+!
+object-group network PARTNERS
+ 172.16.100.0 255.255.255.248
+!
+object-group network LAW_CLERKS
+ 172.16.200.0 255.255.255.248
+!
+object-group network LEGAL_SECRETARIES
+ 172.16.210.0 255.255.255.224
+!
+object-group network IT_SUPPORT
+ 172.16.30.0 255.255.255.248
+!
+object-group network MARKETING_LEADS
+ 172.16.31.0 255.255.255.248
+!
+object-group network INTERNAL_NETWORK
+ group-object PARTNERS
+ group-object ASSOCIATES
+ group-object LAW_CLERKS
+ group-object LEGAL_SECRETARIES
+ group-object IT_SUPPORT
+ group-object MARKETING_LEADS
+ group-object CHIEF_LEGAL_OFFICE
+!
+object-group network INTERNAL_SERVER_FARM
+ 172.16.66.0 255.255.255.248
+!
+object-group network MANAGEMENT_VLAN
+ 172.16.68.0 255.255.255.240
+!
+object-group network SYSLOG
+ 172.16.67.0 255.255.255.252
+!
+object-group network MANAGEMENT_NETWORK
+ group-object MANAGEMENT_VLAN
+ group-object SYSLOG
+!
+object-group network WAN_FACING_SERVICES
+ group-object DMZ
+ group-object HONEYPOT
+!
+object-group network test
+!
+username sea4eggs-admin privilege 15 secret 8 $8$IujD1jaRA9t5S.$6byK0F10nmwAevk9Spi2LVP0.MSedAIkliJn1/IdE8Q
+!
+redundancy
+!
+!
+!
+!
+no cdp run
+!
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description Firewall
+ ip address 172.16.3.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description DMZ
+ ip address 172.16.81.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ description TopSecretDataStorage
+ ip address 172.16.69.1 255.255.255.252
+ ip access-group RESTRICT_HONEY_OUTBOUND in
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 0.0.0.0 0.0.0.0 172.16.3.1
+ip tacacs source-interface GigabitEthernet0/0
+!
+ip access-list extended RESTRICT_HONEY_OUTBOUND
+ deny   ip object-group HONEYPOT object-group INTERNAL_NETWORK
+ deny   ip object-group HONEYPOT object-group MANAGEMENT_NETWORK
+ deny   ip object-group HONEYPOT object-group DMZ
+ deny   ip object-group HONEYPOT object-group SYSLOG
+ permit ip object-group HONEYPOT any
+!
+logging source-interface GigabitEthernet0/0
+logging host 172.16.67.2
+!
+!
+tacacs server TACACSERVER
+ address ipv4 172.16.68.8
+ key Sea4EggsC0mpl3xP@ssw0rd
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 15
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp logging
+ntp server 172.16.67.2 prefer
+!
+end

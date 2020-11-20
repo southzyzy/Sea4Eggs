@@ -1,0 +1,273 @@
+Current configuration : 6385 bytes
+!
+! Last configuration change at 17:38:20 SGT Fri Nov 20 2020 by network_manager
+! NVRAM config last updated at 17:38:22 SGT Fri Nov 20 2020 by network_manager
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Edge-Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 8 $8$OslckCYzZNrYCU$mBnX6HYO2IdXQS1TwIlGrs1np1qv.Dg0jThNdXgAI0I
+!
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization commands 15 default group tacacs+ local
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone SGT 8 0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name intranet.sea4eggs.sitict.net
+ip cef
+login on-failure log
+login on-success log
+no ipv6 cef
+!
+!
+flow exporter NetflowExport
+ destination 172.16.67.2
+ source GigabitEthernet0/1
+ transport udp 9991
+ template data timeout 60
+ option application-table timeout 60
+ option application-attributes timeout 300
+!
+!
+flow record NetflowTraffic
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect routing source as
+ collect routing destination as
+ collect interface output
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+ collect application name
+!
+!
+flow monitor NetflowMonitor
+ exporter NetflowExport
+ cache timeout active 60
+ record NetflowTraffic
+!
+multilink bundle-name authenticated
+!
+!
+cts logging verbose
+!
+!
+license udi pid CISCO2901/K9 sn FGL184821RP
+!
+!
+object-group network ASSOCIATES
+ 172.16.110.0 255.255.255.240
+!
+object-group network CHIEF_LEGAL_OFFICE
+ 172.16.37.0 255.255.255.248
+!
+object-group network DMZ
+ host 172.16.81.2
+!
+object-group network HONEYPOT
+ 172.16.69.0 255.255.255.252
+!
+object-group network PARTNERS
+ 172.16.100.0 255.255.255.248
+!
+object-group network LAW_CLERKS
+ 172.16.200.0 255.255.255.248
+!
+object-group network LEGAL_SECRETARIES
+ 172.16.210.0 255.255.255.224
+!
+object-group network IT_SUPPORT
+ 172.16.30.0 255.255.255.248
+!
+object-group network MARKETING_LEADS
+ 172.16.31.0 255.255.255.248
+!
+object-group network INTERNAL_SERVER_FARM
+ 172.16.66.0 255.255.255.248
+!
+object-group network INTERNAL_NETWORK
+ group-object PARTNERS
+ group-object ASSOCIATES
+ group-object LAW_CLERKS
+ group-object LEGAL_SECRETARIES
+ group-object IT_SUPPORT
+ group-object MARKETING_LEADS
+ group-object CHIEF_LEGAL_OFFICE
+ group-object INTERNAL_SERVER_FARM
+!
+object-group network MANAGEMENT_VLAN
+ 172.16.68.0 255.255.255.240
+!
+object-group network SYSLOG
+ 172.16.67.0 255.255.255.252
+!
+username sea4eggs-admin privilege 15 secret 8 $8$2E/p7HDImGRUYk$eCDW2CpC6y0XJj2ZqcFQGeMlJSK8anWTGECLHbcQjk2
+!
+redundancy
+!
+!
+!
+!
+no cdp run
+!
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description WAN
+ ip address 172.27.47.17 255.255.255.248
+ ip access-group 110 in
+ ip nat outside
+ ip virtual-reassembly in
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description EDGE
+ ip address 172.16.0.1 255.255.255.252
+ ip flow monitor NetflowMonitor input
+ ip flow monitor NetflowMonitor output
+ ip nat inside
+ ip virtual-reassembly in
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+interface Serial0/0/1
+ no ip address
+ shutdown
+ clock rate 2000000
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip nat pool PUBLIC 129.126.164.20 129.126.164.22 netmask 255.255.255.248
+ip nat inside source list 101 pool PUBLIC overload
+ip nat inside source static tcp 172.16.81.2 53 129.126.164.17 53 extendable
+ip nat inside source static udp 172.16.81.2 53 129.126.164.17 53 extendable
+ip nat inside source static tcp 172.16.69.2 21 129.126.164.18 21 extendable
+ip nat inside source static tcp 172.16.69.2 22 129.126.164.18 22 extendable
+ip nat inside source static tcp 172.16.81.2 80 129.126.164.18 80 extendable
+ip route 0.0.0.0 0.0.0.0 172.27.47.18
+ip route 172.16.1.0 255.255.255.252 172.16.0.2
+ip route 172.16.2.0 255.255.255.252 172.16.0.2
+ip route 172.16.3.0 255.255.255.252 172.16.0.2
+ip route 172.16.4.0 255.255.255.252 172.16.0.2
+ip route 172.16.30.0 255.255.255.248 172.16.0.2
+ip route 172.16.31.0 255.255.255.248 172.16.0.2
+ip route 172.16.37.0 255.255.255.248 172.16.0.2
+ip route 172.16.66.0 255.255.255.248 172.16.0.2
+ip route 172.16.67.0 255.255.255.252 172.16.0.2
+ip route 172.16.68.0 255.255.255.240 172.16.0.2
+ip route 172.16.69.0 255.255.255.252 172.16.0.2
+ip route 172.16.81.0 255.255.255.252 172.16.0.2
+ip route 172.16.100.0 255.255.255.248 172.16.0.2
+ip route 172.16.110.0 255.255.255.240 172.16.0.2
+ip route 172.16.200.0 255.255.255.248 172.16.0.2
+ip route 172.16.210.0 255.255.255.224 172.16.0.2
+ip tacacs source-interface GigabitEthernet0/1
+!
+logging source-interface GigabitEthernet0/1
+logging host 172.16.67.2
+!
+!
+tacacs server TACACSERVER
+ address ipv4 172.16.68.8
+ key Sea4EggsC0mpl3xP@ssw0rd
+access-list 101 permit ip object-group INTERNAL_NETWORK any
+access-list 101 permit ip object-group DMZ any
+access-list 101 permit ip object-group SYSLOG any
+access-list 101 permit ip object-group MANAGEMENT_VLAN any
+access-list 101 remark NAT access list
+access-list 101 permit ip object-group HONEYPOT any
+access-list 110 remark Deny special-use and private addresses
+access-list 110 deny   ip host 0.0.0.0 any
+access-list 110 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 110 deny   ip 192.0.2.0 0.0.0.255 any
+access-list 110 deny   ip 224.0.0.0 31.255.255.255 any
+access-list 110 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 110 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 110 deny   ip object-group INTERNAL_NETWORK any
+access-list 110 deny   ip any object-group INTERNAL_NETWORK
+access-list 110 permit ip any any
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 15
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp logging
+ntp server 172.16.67.2 prefer
+!
+end
