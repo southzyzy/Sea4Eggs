@@ -91,18 +91,22 @@ interface FastEthernet0/3
  switchport nonegotiate
  switchport port-security mac-address sticky
  switchport port-security
+ ip arp inspection limit rate 100
  spanning-tree portfast
  spanning-tree bpduguard enable
  ip verify source port-security
+ ip dhcp snooping limit rate 25
 !
 interface FastEthernet0/4
  switchport mode access
  switchport nonegotiate
  switchport port-security mac-address sticky
  switchport port-security
+ ip arp inspection limit rate 100
  spanning-tree portfast
  spanning-tree bpduguard enable
  ip verify source port-security
+ ip dhcp snooping limit rate 25
 !
 interface FastEthernet0/5
  switchport mode access
