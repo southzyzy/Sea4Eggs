@@ -360,6 +360,7 @@ interface FastEthernet0/24
 !
 interface GigabitEthernet0/1
  switchport trunk allowed vlan 37,66,100,110,200,300,310
+ switchport trunk native vlan 99
  switchport mode trunk
  switchport nonegotiate
  ip arp inspection trust
@@ -367,6 +368,7 @@ interface GigabitEthernet0/1
 !
 interface GigabitEthernet0/2
  switchport trunk allowed vlan 37,66,100,110,200,300,310
+ switchport trunk native vlan 99
  switchport mode trunk
  switchport nonegotiate
  ip arp inspection trust
