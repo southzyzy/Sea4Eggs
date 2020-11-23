@@ -4,10 +4,10 @@
 ## Network Topology
 
 ### Physical Topology
-![alt text](Network\ Diagram/physical_diagram.png "Physical Toplogy")
+![Physical Topology](img/physical_diagram.png)
 
 ### Logical Topology
-![alt text](Network\ Diagram/logical_diagram.png "Physical Toplogy")
+![Logical Topology](img/logical_diagram.png)
 
 ---
 
