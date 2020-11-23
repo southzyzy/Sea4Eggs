@@ -313,15 +313,16 @@ Defenses Configured:
 	|_ # Allow INTERNAL_SERVER_NET access to SYSLOG_SERVER
 	|_ access-list L3SW1_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group INTERNAL_SERVER_NET object-group SYSLOG_SERVER
 	|_
-	|_ # Permit INTERNAL_NETWORK web access (HTTP) to DMZ_SERVER
+	|_ # Permit INTERNAL_NETWORK web access (HTTP) and ICMP to DMZ_SERVER
+	|_ access-list L3SW1_INBOUND extended permit icmp object-group INTERNAL_NETWORK object-group DMZ_SERVER
 	|_ access-list L3SW1_INBOUND extended permit tcp object-group INTERNAL_NETWORK object-group DMZ_SERVER eq 80
 	|_
-	|_ # Allow IT_SUPPORT to access EDGE-ROUTER, R1-MGNT-SYSLOG, R2-DMZ, IT_MANAGEMENT and DMZ_NET
-	|_ access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group EDGE_ROUTER_MGNT
-	|_ access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group R1_FW_UPLINK
-	|_ access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group R2_FW_UPLINK
-	|_ access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group IT_MANAGEMENT
-	|_ access-list L3SW1_INBOUND extended permit ip object-group IT_SUPPORT object-group DMZ_NET
+	|_ ! Allow IT_SUPPORT to access Management Network Jumphost (TACACS) via SSH and SYSLOG Web UI via HTTP/HTTPS, as well as ICMP
+	|_ access-list L3SW1_INBOUND extended permit icmp object-group IT_SUPPORT object-group TACACS_SERVER
+	|_ access-list L3SW1_INBOUND extended permit tcp object-group IT_SUPPORT object-group TACACS_SERVER eq 22
+	|_ access-list L3SW1_INBOUND extended permit icmp object-group IT_SUPPORT object-group SYSLOG_SERVER
+	|_ access-list L3SW1_INBOUND extended permit tcp object-group IT_SUPPORT object-group SYSLOG_SERVER eq 80
+	|_ access-list L3SW1_INBOUND extended permit tcp object-group IT_SUPPORT object-group SYSLOG_SERVER eq 443
 	|_ 
 	|_ # Deny any access to EDGE-ROUTER (SSH), R1-MGNT-SYSLOG, R2-DMZ, IT_MANAGEMENT and DMZ_NET
 	|_ access-list L3SW1_INBOUND extended deny tcp any object-group EDGE_ROUTER_MGNT eq 22
@@ -350,15 +351,16 @@ Defenses Configured:
 	|_ # Allow INTERNAL_SERVER_NET access to SYSLOG_SERVER
 	|_ access-list L3SW2_INBOUND extended permit object-group SYSLOG_TRAFFIC object-group INTERNAL_SERVER_NET object-group SYSLOG_SERVER
 	|_
-	|_ # Permit INTERNAL_NETWORK web access (HTTP) to DMZ_SERVER
+	|_ # Permit INTERNAL_NETWORK web access (HTTP) and ICMP to DMZ_SERVER
+	|_ access-list L3SW2_INBOUND extended permit icmp object-group INTERNAL_NETWORK object-group DMZ_SERVER
 	|_ access-list L3SW2_INBOUND extended permit tcp object-group INTERNAL_NETWORK object-group DMZ_SERVER eq 80
 	|_
-	|_ # Allow IT_SUPPORT to access EDGE-ROUTER, R1-MGNT-SYSLOG, R2-DMZ, IT_MANAGEMENT and DMZ_NET
-	|_ access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group EDGE_ROUTER_MGNT
-	|_ access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group R1_FW_UPLINK
-	|_ access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group R2_FW_UPLINK
-	|_ access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group IT_MANAGEMENT
-	|_ access-list L3SW2_INBOUND extended permit ip object-group IT_SUPPORT object-group DMZ_NET
+	|_ ! Allow IT_SUPPORT to access Management Network Jumphost (TACACS) via SSH and SYSLOG Web UI via HTTP/HTTPS, as well as ICMP
+	|_ access-list L3SW2_INBOUND extended permit icmp object-group IT_SUPPORT object-group TACACS_SERVER
+	|_ access-list L3SW2_INBOUND extended permit tcp object-group IT_SUPPORT object-group TACACS_SERVER eq 22
+	|_ access-list L3SW2_INBOUND extended permit icmp object-group IT_SUPPORT object-group SYSLOG_SERVER
+	|_ access-list L3SW2_INBOUND extended permit tcp object-group IT_SUPPORT object-group SYSLOG_SERVER eq 80
+	|_ access-list L3SW2_INBOUND extended permit tcp object-group IT_SUPPORT object-group SYSLOG_SERVER eq 443
 	|_ 
 	|_ # Deny any access to EDGE-ROUTER (SSH), R1-MGNT-SYSLOG, R2-DMZ, IT_MANAGEMENT and DMZ_NET
 	|_ access-list L3SW2_INBOUND extended deny tcp any object-group EDGE_ROUTER_MGNT eq 22
