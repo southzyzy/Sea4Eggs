@@ -1,6 +1,14 @@
 # Sea4Eggs
 ### Network Security Team Project
 
+## Network Topology
+
+### Physical Topology
+![alt text](Network\ Diagram/physical_diagram.png "Physical Toplogy")
+
+### Logical Topology
+![alt text](Network\ Diagram/logical_diagram.png "Physical Toplogy")
+
 ---
 
 ## SSH around MGNT Network
