@@ -577,6 +577,9 @@ Defenses Configured:
 	|_ switchport trunk native vlan 99
 	|_ switchport trunk allowed vlan 100,110,200,300,310,37,66
 	|_
+	|_ int g1/0/2
+	|_ switchport nonegotiate
+	|_
 	|_ int g1/0/24
 	|_ switchport mode trunk
 	|_ switchport nonegotiate
@@ -666,6 +669,9 @@ Defenses Configured:
 	|_ switchport nonegotiate
 	|_ switchport trunk native vlan 99
 	|_ switchport trunk allowed vlan 100,110,200,300,310,37,66
+	|_
+	|_ int g1/0/2
+	|_ switchport nonegotiate
 	|_
 	|_ int g1/0/24
 	|_ switchport mode trunk
