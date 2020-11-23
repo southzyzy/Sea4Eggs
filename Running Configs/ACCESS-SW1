@@ -1,6 +1,7 @@
-Current configuration : 10161 bytes
+Current configuration : 10205 bytes
 !
-! Last configuration change at 16:54:09 SGT Fri Nov 20 2020 by network_manager
+! Last configuration change at 12:31:24 SGT Mon Nov 23 2020 by network_manager
+! NVRAM config last updated at 12:31:25 SGT Mon Nov 23 2020 by network_manager
 !
 version 15.0
 no service pad
@@ -353,22 +354,19 @@ interface FastEthernet0/24
  switchport access vlan 68
  switchport mode access
  switchport nonegotiate
- switchport port-security mac-address sticky
- ip arp inspection limit rate 100
- no cdp enable
- ip dhcp snooping limit rate 25
+ ip arp inspection trust
 !
 interface GigabitEthernet0/1
- switchport trunk allowed vlan 37,66,100,110,200,300,310
  switchport trunk native vlan 99
+ switchport trunk allowed vlan 37,66,100,110,200,300,310
  switchport mode trunk
  switchport nonegotiate
  ip arp inspection trust
  ip dhcp snooping trust
 !
 interface GigabitEthernet0/2
- switchport trunk allowed vlan 37,66,100,110,200,300,310
  switchport trunk native vlan 99
+ switchport trunk allowed vlan 37,66,100,110,200,300,310
  switchport mode trunk
  switchport nonegotiate
  ip arp inspection trust
