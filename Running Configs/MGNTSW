@@ -1,7 +1,7 @@
-Current configuration : 8092 bytes
+Current configuration : 9318 bytes
 !
-! Last configuration change at 18:01:06 SGT Fri Nov 20 2020 by network_manager
-! NVRAM config last updated at 17:51:15 SGT Fri Nov 20 2020 by network_manager
+! Last configuration change at 12:17:05 SGT Mon Nov 23 2020 by network_manager
+! NVRAM config last updated at 00:34:15 SGT Thu Jan 12 2034 by network_manager
 !
 version 15.0
 no service pad
@@ -22,7 +22,7 @@ aaa new-model
 !
 aaa authentication login default group tacacs+ local
 aaa authentication enable default group tacacs+ enable
-aaa authorization commands 15 default group tacacs+ local 
+aaa authorization commands 15 default group tacacs+ local
 aaa accounting commands 0 default start-stop group tacacs+
 aaa accounting commands 15 default start-stop group tacacs+
 !
@@ -35,7 +35,7 @@ aaa session-id common
 clock timezone SGT 8 0
 switch 1 provision ws-c2960x-24ts-l
 ip arp inspection vlan 1
-ip arp inspection validate src-mac dst-mac ip 
+ip arp inspection validate src-mac dst-mac ip
 !
 !
 ip dhcp snooping
@@ -64,35 +64,62 @@ ip ssh version 2
 interface FastEthernet0
  no ip address
  no ip route-cache
+ shutdown
 !
 interface GigabitEthernet1/0/1
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky f4cf.e211.268e
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/2
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky d46d.50d0.be00
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/3
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 5c71.0dbd.8880
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/4
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 1ce8.5d75.f818
+ switchport port-security mac-address sticky 1ce8.5d75.f841
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/5
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 1ce8.5de2.a098
+ switchport port-security mac-address sticky 1ce8.5de2.a0c1
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/6
  switchport mode access
  switchport nonegotiate
+ switchport port-security maximum 8
+ switchport port-security
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky ecf4.bb60.40d4
  ip arp inspection trust
 !
 interface GigabitEthernet1/0/7
@@ -114,13 +141,12 @@ interface GigabitEthernet1/0/8
  spanning-tree bpduguard enable
 !
 interface GigabitEthernet1/0/9
- switchport access vlan 99
  switchport mode access
  switchport nonegotiate
  switchport port-security
  switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 00e0.4c00.437e
  ip arp inspection limit rate 100
- shutdown
  spanning-tree bpduguard enable
 !
 interface GigabitEthernet1/0/10
@@ -318,6 +344,7 @@ no ip http server
 no ip http secure-server
 !
 ip tacacs source-interface Vlan1
+ip source binding 00E0.4C00.437E vlan 1 172.16.68.13 interface Gi1/0/9
 ip source binding 00E0.4C79.31E8 vlan 1 172.16.68.12 interface Gi1/0/7
 ip source binding 2C16.DBA0.C89F vlan 1 172.16.68.11 interface Gi1/0/8
 logging host 172.16.67.2
