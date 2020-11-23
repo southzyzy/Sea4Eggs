@@ -63,6 +63,7 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <tar
 
 | Device | Username | Password |
 | --- |:---:|:---:|
+| All Network Devices | sea4eggs-admin | 1qwer$#@!~sea4eggs |
 | Splunk | sea4eggs-admin | 1qwer$#@!~sea4eggs |
 | Database | root | rootcatdogmousehorse |
 | Database | sea4eggs-admin | catdogmousehorse |
