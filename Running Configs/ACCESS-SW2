@@ -1,6 +1,7 @@
-Current configuration : 8345 bytes
+Current configuration : 8365 bytes
 !
-! Last configuration change at 10:20:56 SGT Wed Mar 3 1993 by network_manager
+! Last configuration change at 12:24:19 SGT Mon Nov 23 2020 by network_manager
+! NVRAM config last updated at 12:25:48 SGT Mon Nov 23 2020 by network_manager
 !
 version 15.0
 no service pad
@@ -67,7 +68,6 @@ interface FastEthernet0/1
  switchport mode access
  switchport nonegotiate
  switchport port-security mac-address sticky
- switchport port-security mac-address sticky 00e0.4c00.437e
  switchport port-security
  ip arp inspection limit rate 100
  spanning-tree portfast
@@ -341,5 +341,4 @@ line vty 5 15
 !
 ntp logging
 ntp server 172.16.67.2 prefer
-
 end
