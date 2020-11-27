@@ -36,8 +36,14 @@
 
 ### SSH Command
 
+#### Around Router/Switches
 ```shell
 ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes128-cbc -l <username> <target_ip>
+```
+
+#### Around Nuc
+```shell
+ssh localadm@172.16.67.2 -p 32203
 ```
 
 ---
